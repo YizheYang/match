@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        buildInfo = [updatePath: 'update', updateInfoFilename: 'updateInfo.json', versionCode: 1, versionName: 1.0, updateBaseUrl: 'https://raw.githubusercontent.com/YizheYang/match/room/update/updateInfo.json']
+        buildInfo = [updatePath: 'update', updateInfoFilename: 'updateInfo.json', versionCode: 1, versionName: 1.0, updateBaseUrl: 'https://raw.githubusercontent.com/YizheYang/match/room/update/']
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {

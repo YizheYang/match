@@ -1,81 +1,101 @@
+import com.google.gson.Gson
+
+import java.security.MessageDigest
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
 }
 
-//static String generateMD5(File file) {
-//    if (!file.exists() || !file.isFile()) {
-//        return null
-//    }
-//    def digest = MessageDigest.getInstance("MD5")
-//    file.withInputStream() { is ->
-//        byte[] buffer = new byte[8192]
-//        int read
-//        while ((read = is.read(buffer)) > 0) {
-//            digest.update(buffer, 0, read)
-//        }
-//    }
-//    return digest.digest().encodeHex().toString()
-//}
-//
-//void generateUpdateInfo(String apkName) {
-//    println("------------------ Generating version info ------------------")
-//    // 把apk文件从build目录复制到根项目的update文件夹下
-//    def apkFile = project.file("./release/$apkName")
-//    if (!apkFile.exists()) {
-//        throw new Exception("apk file not exist!")
-//    }
-//    def toDir = rootProject.file("${buildInfo.get("updatePath")}")
-//    String apkHash = generateMD5(apkFile)
-//    def updateJsonFile = new File(toDir, buildInfo.get("updateInfoFilename"))
-//    def writeNewFile = true
-//    // 如果有以前的json文件，检查这次打包是否有改变
-//    if (updateJsonFile.exists()) {
-//        try {
-//            def oldUpdateInfo = new Gson().parse(updateJsonFile)
-//            if (buildInfo[versionCode] <= oldUpdateInfo.code && apkHash == oldUpdateInfo.md5) {
-//                writeNewFile = false
-//            }
-//        } catch (Exception e) {
-//            writeNewFile = true
-//            e.printStackTrace()
-//            updateJsonFile.delete()
-//        }
-//    }
-//    if (writeNewFile) {
-//        def oldFiles = toDir.listFiles()
-//        oldFiles.each {
-//            if (!it.delete()) {
-//                it.deleteOnExit()
-//            }
-//        }
-//        copy {
-//            from(apkFile)
-//            into(toDir)
-//        }
-//        // 创建json的实体类
-//        // Expando可以简单理解为Map
-//        def updateInfo = new Bundle(
-//                "versionCode", buildInfo.get("versionCode"),
-//                "version", buildInfo.get("versionName"),
-//                "url", "${buildInfo.get("updateBaseUrl")}${apkFile.name}",
-//                "size", apkFile.length(),
-//                "md5", apkHash)
-//        String newApkHash = generateMD5(new File(toDir, apkName))
-//        println("new apk md5: $newApkHash")
-//        def outputJson = new Gson(updateInfo).toPrettyString()
-//        println(outputJson)
-//        // 将json写入文件中，用于查询更新
-//        updateJsonFile.write(outputJson)
-//    } else {
-//        // 不需要更新
-////        println("This version is already released.\n"
-////                + "VersionCode = ${buildInfo.versionCode}\n"
-////                + "Skip generateUpdateInfo.")
-//    }
-//    println("------------------ Finish Generating version info ------------------")
-//}
+static String generateMD5(File file) {
+    if (!file.exists() || !file.isFile()) {
+        return null
+    }
+    def digest = MessageDigest.getInstance("MD5")
+    file.withInputStream() { is ->
+        byte[] buffer = new byte[8192]
+        int read
+        while ((read = is.read(buffer)) > 0) {
+            digest.update(buffer, 0, read)
+        }
+    }
+    return digest.digest().encodeHex().toString()
+}
+
+class Bean {
+    int versionCode
+    String version
+    String url
+    Long size
+    String md5
+
+    Bean(int code, String version, String url, Long size, String md5) {
+        this.versionCode = code
+        this.version = version
+        this.url = url
+        this.size = size
+        this.md5 = md5
+    }
+}
+
+void generateUpdateInfo(String apkName) {
+    println("------------------ Generating version info ------------------")
+    // 把apk文件从build目录复制到根项目的update文件夹下
+    def apkFile = project.file("./release/$apkName")
+    if (!apkFile.exists()) {
+        throw new Exception("apk file not exist!")
+    }
+    def toDir = rootProject.file("${buildInfo.get("updatePath")}")
+    String apkHash = generateMD5(apkFile)
+    def updateJsonFile = new File(toDir, buildInfo.get("updateInfoFilename"))
+    def writeNewFile = true
+    // 如果有以前的json文件，检查这次打包是否有改变
+    if (updateJsonFile.exists()) {
+        try {
+            def oldUpdateInfo = Gson().fromJson(updateJsonFile, UpdateInfoBean::class.java)
+            if (buildInfo.get("versionCode") <= oldUpdateInfo.code && apkHash == oldUpdateInfo.md5) {
+                writeNewFile = false
+            }
+        } catch (Exception e) {
+            writeNewFile = true
+            e.printStackTrace()
+            updateJsonFile.delete()
+        }
+    }
+    if (writeNewFile) {
+        def oldFiles = toDir.listFiles()
+        oldFiles.each {
+            if (!it.delete()) {
+                it.deleteOnExit()
+            }
+        }
+        copy {
+            from(apkFile)
+            into(toDir)
+        }
+        // 创建json的实体类
+        // Expando可以简单理解为Map
+        def updateInfo = new Bean(
+                buildInfo.get("versionCode"),
+                buildInfo.get("versionName").toString(),
+                "${buildInfo.get("updateBaseUrl")}${apkFile.name}",
+                apkFile.length(),
+                apkHash)
+        String newApkHash = generateMD5(new File(toDir, apkName))
+        println("new apk md5: $newApkHash")
+        def outputJson = new Gson().toJson(updateInfo)
+        println(outputJson)
+        // 将json写入文件中，用于查询更新
+        updateJsonFile.write(outputJson)
+    } else {
+        // 不需要更新
+        println("This version is already released.\n"
+                + "VersionCode = ${buildInfo.get("versionCode")}\n"
+                + "Skip generateUpdateInfo.")
+    }
+    println("------------------ Finish Generating version info ------------------")
+}
 
 android {
     compileSdk 30
@@ -84,8 +104,8 @@ android {
         applicationId "com.yyz.match"
         minSdk 21
         targetSdk 30
-        versionCode 1//buildInfo[versionCode]
-        versionName "1.0"//buildInfo[versionName]
+        versionCode 1
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -100,8 +120,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-//            buildConfigField "String", "VERSION_NAME", "\"1.0\""
-//            buildConfigField "int", "VERSION_CODE", "${String.valueOf(1)}"
         }
     }
     compileOptions {
@@ -112,19 +130,21 @@ android {
         jvmTarget = '1.8'
     }
 
-//    applicationVariants.all { variant -> // 同一App名，方便操作
-//        def apkName = "match-${variant.buildType.name}-${defaultConfig.versionName}.apk"
-//        variant.outputs.all {
-//            outputFileName = apkName
-//        }
-//        // 只在release添加
-//        if (variant.buildType.name == "release") {
-////         直接添加到Task的Action队尾，build执行完成后就可以执行这个函数
-//            variant.assembleProvider.get().doLast {
-//                generateUpdateInfo(apkName)
-//            }
-//        }
-//    }
+    applicationVariants.all { variant -> // 同一App名，方便操作
+        def apkName = "match-${variant.buildType.name}-${defaultConfig.versionName}.apk"
+        variant.outputs.all {
+            outputFileName = apkName
+        }
+        // 只在release添加
+        if (variant.buildType.name == "release") {
+//         直接添加到Task的Action队尾，build执行完成后就可以执行这个函数
+            variant.assembleProvider.get().doLast {
+                buildInfo.put("versionCode", defaultConfig.versionCode)
+                buildInfo.put("versionName", defaultConfig.versionName)
+                generateUpdateInfo(apkName)
+            }
+        }
+    }
 }
 
 dependencies {
