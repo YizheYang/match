@@ -6,11 +6,12 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowInsetsController
+import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
-import com.yyz.match.MyUncaughtExceptionHandler
 import com.yyz.match.database.MatchDatabase
+import com.yyz.match.widget.MyUncaughtExceptionHandler
 
 /**
  * description none
@@ -31,7 +32,7 @@ abstract class BaseActivity : AppCompatActivity() {
             Thread.setDefaultUncaughtExceptionHandler(MyUncaughtExceptionHandler(this))
         }
         setContentView(getLayoutId())
-        autoAdjustStatusBarText()
+//        autoAdjustStatusBarText()
         db = Room.databaseBuilder(this, MatchDatabase::class.java, "Store.db")
             .allowMainThreadQueries()
             .fallbackToDestructiveMigration()
@@ -66,5 +67,11 @@ abstract class BaseActivity : AppCompatActivity() {
 
     fun getPersonList(table: String): MutableList<String> {
         return db.getPersonDao().getPersonByTable(table).map { it.parameter }.sorted().toMutableList()
+    }
+
+    fun showToast(string: String, length: Int = Toast.LENGTH_SHORT) {
+        runOnUiThread {
+            Toast.makeText(this, string, length).show()
+        }
     }
 }

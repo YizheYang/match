@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
-import com.yyz.match.PersonAdapter
+import com.yyz.match.adapter.PersonAdapter
 import com.yyz.match.R
 import com.yyz.match.base.BaseActivity
 import com.yyz.match.entity.PersonBean

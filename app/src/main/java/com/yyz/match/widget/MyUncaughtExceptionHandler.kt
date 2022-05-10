@@ -1,4 +1,4 @@
-package com.yyz.match
+package com.yyz.match.widget
 
 import android.content.Context
 import android.os.Process
