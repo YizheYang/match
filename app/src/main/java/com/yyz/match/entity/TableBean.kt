@@ -1,5 +1,9 @@
 package com.yyz.match.entity
 
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
+
 /**
  * description none
  * author ez_yang@qq.com
@@ -7,11 +11,14 @@ package com.yyz.match.entity
  * version 1.0
  * update none
  **/
+@Entity(tableName = "table")
 data class TableBean(
+    @PrimaryKey(autoGenerate = true)
     val id: Int?,
     var name: String?,
     val chinese: String
 ) {
+    @Ignore
     constructor(chinese: String) : this(null, null, chinese) {
         generateName()
     }

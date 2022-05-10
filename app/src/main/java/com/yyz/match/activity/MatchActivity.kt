@@ -10,8 +10,6 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import com.yyz.match.Constants
-import com.yyz.match.MyDbHelper
 import com.yyz.match.R
 import com.yyz.match.base.BaseActivity
 import com.yyz.match.entity.PersonBean
@@ -52,13 +50,14 @@ class MatchActivity : BaseActivity() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun setListener() {
-        choose.attachDataSource(mutableListOf(Constants.table))
+        choose.attachDataSource(getTableNameList())
 
         confirm.setOnClickListener {
             val s = input.text.toString()
             val waitList = processList(s)
             val table = choose.selectedItem.toString()
-            val sqlList = getListFromSqlite(table)
+//            val sqlList = getListFromSqlite(table)
+            val sqlList = db.getPersonDao().getPersonByTable(table)
             val resultList = listMines(waitList, sqlList)
             val sb = StringBuilder()
             for (result in resultList) {
@@ -86,21 +85,25 @@ class MatchActivity : BaseActivity() {
         return list
     }
 
-    private fun getListFromSqlite(table: String): MutableList<PersonBean> {
-        val list = mutableListOf<PersonBean>()
-        val helper1 = MyDbHelper(this, table, 1)
-        val db1 = helper1.readableDatabase
-        val cursor = db1.query(table, null, null, null, null, null, null)
-        if (cursor.moveToNext()) {
-            do {
-                val id = cursor.getInt(cursor.getColumnIndex("id"))
-                val parameter = cursor.getString(cursor.getColumnIndex("parameter"))
-                list.add(PersonBean(id, parameter))
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        return list
+    private fun getTableNameList(): MutableList<String> {
+        return db.getTableDao().getAllTable().map { it.chinese }.toMutableList()
     }
+
+//    private fun getListFromSqlite(table: String): MutableList<PersonBean> {
+//        val list = mutableListOf<PersonBean>()
+//        val helper1 = MyDbHelper(this, table, 1)
+//        val db1 = helper1.readableDatabase
+//        val cursor = db1.query(table, null, null, null, null, null, null)
+//        if (cursor.moveToNext()) {
+//            do {
+//                val id = cursor.getInt(cursor.getColumnIndex("id"))
+//                val parameter = cursor.getString(cursor.getColumnIndex("parameter"))
+//                list.add(PersonBean(id, parameter))
+//            } while (cursor.moveToNext())
+//        }
+//        cursor.close()
+//        return list
+//    }
 
     private fun listMines(
         waitList: MutableList<PersonBean>,

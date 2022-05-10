@@ -8,8 +8,9 @@ import android.view.View
 import android.view.WindowInsetsController
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.room.Room
 import com.yyz.match.MyUncaughtExceptionHandler
-import com.yyz.match.SqliteUtil
+import com.yyz.match.database.MatchDatabase
 
 /**
  * description none
@@ -19,7 +20,8 @@ import com.yyz.match.SqliteUtil
  * update none
  **/
 abstract class BaseActivity : AppCompatActivity() {
-    private lateinit var sql: SqliteUtil
+    //    private lateinit var sql: SqliteUtil
+    lateinit var db: MatchDatabase
 
     @LayoutRes
     abstract fun getLayoutId(): Int
@@ -31,11 +33,15 @@ abstract class BaseActivity : AppCompatActivity() {
         }
         setContentView(getLayoutId())
         autoAdjustStatusBarText()
+        db = Room.databaseBuilder(this, MatchDatabase::class.java, "Store.db")
+            .allowMainThreadQueries()
+            .fallbackToDestructiveMigration()
+            .build()
         initView()
         if (savedInstanceState != null) {
             recoveryData(savedInstanceState)
         }
-        sql = SqliteUtil(this)
+//        sql = SqliteUtil(this)
     }
 
     open fun initView() {}
