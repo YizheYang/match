@@ -59,4 +59,12 @@ abstract class BaseActivity : AppCompatActivity() {
             }
         }
     }
+
+    fun getTableNameList(): MutableList<String> {
+        return db.getTableDao().getAllTable().map { it.chinese }.sorted().toMutableList()
+    }
+
+    fun getPersonList(table: String): MutableList<String> {
+        return db.getPersonDao().getPersonByTable(table).map { it.parameter }.sorted().toMutableList()
+    }
 }

@@ -42,7 +42,7 @@ class AddActivity : BaseActivity() {
         add.setOnClickListener {
             val s = input.text.toString()
             val tableName = table.text.toString()
-            if (s.isBlank() || tableName.isBlank()) {
+            if (s.isEmpty() || tableName.isEmpty()) {
                 Toast.makeText(this, "请输入完整的参数", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -58,7 +58,7 @@ class AddActivity : BaseActivity() {
 
     private fun processList(s: String, table: String): MutableList<PersonBean> {
         val list = mutableListOf<PersonBean>()
-        for (p in s.split(Regex("\n")).distinct()) {
+        for (p in s.split(Regex("[0-9]*[\\.][ ]*|[\\n][0-9]*[\\.]*[ ]*")).distinct()) {
             if (p.isNotEmpty() && p !in getPersonList(table)) {
                 val personBean = PersonBean(p, table)
                 list.add(personBean)
@@ -67,11 +67,4 @@ class AddActivity : BaseActivity() {
         return list
     }
 
-    private fun getTableNameList(): MutableList<String> {
-        return db.getTableDao().getAllTable().map { it.chinese }.sorted().toMutableList()
-    }
-
-    private fun getPersonList(table: String): MutableList<String> {
-        return db.getPersonDao().getPersonByTable(table).map { it.parameter }.sorted().toMutableList()
-    }
 }

@@ -41,7 +41,9 @@ class PersonAdapter(private val list: MutableList<PersonBean>) :
     }
 
     override fun onBindViewHolder(holder: PersonViewHolder, position: Int) {
-        holder.title.text = list[position].parameter
+        val sb = StringBuilder()
+        sb.append(position + 1).append(".").append(list[position].parameter)
+        holder.title.text = sb.toString()
     }
 
     override fun getItemCount() = list.size

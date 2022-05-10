@@ -54,15 +54,17 @@ class MatchActivity : BaseActivity() {
 
         confirm.setOnClickListener {
             val s = input.text.toString()
-            val waitList = processList(s)
-            val table = choose.selectedItem.toString()
-            val sqlList = db.getPersonDao().getPersonByTable(table)
-            val resultList = listMines(waitList, sqlList)
-            val sb = StringBuilder()
-            for (result in resultList) {
-                sb.append(result.parameter).append("\n")
+            if (s.isNotEmpty()) {
+                val waitList = processList(s)
+                val table = choose.selectedItem.toString()
+                val sqlList = db.getPersonDao().getPersonByTable(table)
+                val resultList = listMines(waitList, sqlList)
+                val sb = StringBuilder()
+                for (result in resultList) {
+                    sb.append(result.parameter).append("\n")
+                }
+                output.text = sb.toString()
             }
-            output.text = sb.toString()
         }
 
         copy.setOnClickListener {
@@ -75,17 +77,13 @@ class MatchActivity : BaseActivity() {
 
     private fun processList(s: String): MutableList<PersonBean> {
         val list = mutableListOf<PersonBean>()
-        for (p in s.split(Regex("\n"))) {
+        for (p in s.split(Regex("[0-9]*[\\.][ ]*|[\\n][0-9]*[\\.]*[ ]*"))) {
             if (p.isNotEmpty()) {
                 val personBean = PersonBean(p)
                 list.add(personBean)
             }
         }
         return list
-    }
-
-    private fun getTableNameList(): MutableList<String> {
-        return db.getTableDao().getAllTable().map { it.chinese }.sorted().toMutableList()
     }
 
     private fun listMines(

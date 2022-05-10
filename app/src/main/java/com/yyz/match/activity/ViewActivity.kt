@@ -96,7 +96,4 @@ class ViewActivity : BaseActivity() {
         }
     }
 
-    private fun getTableNameList(): MutableList<String> {
-        return db.getTableDao().getAllTable().map { it.chinese }.sorted().toMutableList()
-    }
 }
