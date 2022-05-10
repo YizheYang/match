@@ -11,8 +11,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="匹配"
-        app:layout_constraintBottom_toTopOf="@+id/btn_addList"
+        app:layout_constraintBottom_toTopOf="@+id/btn_viewList"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,6 +24,18 @@
         android:text="添加列表"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_viewList" />
+
+    <Button
+        android:id="@+id/btn_viewList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="查看列表"
+        app:layout_constraintBottom_toTopOf="@+id/btn_addList"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_matchAc" />
 

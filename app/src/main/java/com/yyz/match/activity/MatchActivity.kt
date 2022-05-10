@@ -56,7 +56,6 @@ class MatchActivity : BaseActivity() {
             val s = input.text.toString()
             val waitList = processList(s)
             val table = choose.selectedItem.toString()
-//            val sqlList = getListFromSqlite(table)
             val sqlList = db.getPersonDao().getPersonByTable(table)
             val resultList = listMines(waitList, sqlList)
             val sb = StringBuilder()
@@ -86,24 +85,8 @@ class MatchActivity : BaseActivity() {
     }
 
     private fun getTableNameList(): MutableList<String> {
-        return db.getTableDao().getAllTable().map { it.chinese }.toMutableList()
+        return db.getTableDao().getAllTable().map { it.chinese }.sorted().toMutableList()
     }
-
-//    private fun getListFromSqlite(table: String): MutableList<PersonBean> {
-//        val list = mutableListOf<PersonBean>()
-//        val helper1 = MyDbHelper(this, table, 1)
-//        val db1 = helper1.readableDatabase
-//        val cursor = db1.query(table, null, null, null, null, null, null)
-//        if (cursor.moveToNext()) {
-//            do {
-//                val id = cursor.getInt(cursor.getColumnIndex("id"))
-//                val parameter = cursor.getString(cursor.getColumnIndex("parameter"))
-//                list.add(PersonBean(id, parameter))
-//            } while (cursor.moveToNext())
-//        }
-//        cursor.close()
-//        return list
-//    }
 
     private fun listMines(
         waitList: MutableList<PersonBean>,

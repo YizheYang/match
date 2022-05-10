@@ -1,6 +1,7 @@
 package com.yyz.match.database
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.yyz.match.entity.PersonBean
@@ -25,4 +26,10 @@ interface PersonDao {
 
     @Query("SELECT * FROM person WHERE table_chinese==:table")
     fun getPersonByTable(table: String): MutableList<PersonBean>
+
+    @Delete
+    fun delete(personBean: PersonBean)
+
+    @Delete
+    fun delete(mutableList: MutableList<PersonBean>)
 }

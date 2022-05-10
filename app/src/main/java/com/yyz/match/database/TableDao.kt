@@ -1,9 +1,6 @@
 package com.yyz.match.database
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.yyz.match.entity.TableBean
 
 /**
@@ -15,9 +12,15 @@ import com.yyz.match.entity.TableBean
  **/
 @Dao
 interface TableDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(tableBean: TableBean)
 
     @Query("SELECT * FROM `table`")
-    fun getAllTable():MutableList<TableBean>
+    fun getAllTable(): MutableList<TableBean>
+
+    @Query("SELECT * FROM `table` WHERE chinese==:chinese")
+    fun getTable(chinese: String): TableBean
+
+    @Delete
+    fun delete(tableBean: TableBean)
 }

@@ -20,7 +20,6 @@ import com.yyz.match.database.MatchDatabase
  * update none
  **/
 abstract class BaseActivity : AppCompatActivity() {
-    //    private lateinit var sql: SqliteUtil
     lateinit var db: MatchDatabase
 
     @LayoutRes
@@ -41,7 +40,6 @@ abstract class BaseActivity : AppCompatActivity() {
         if (savedInstanceState != null) {
             recoveryData(savedInstanceState)
         }
-//        sql = SqliteUtil(this)
     }
 
     open fun initView() {}

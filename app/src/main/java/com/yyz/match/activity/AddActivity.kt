@@ -5,10 +5,8 @@ import android.content.Intent
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.room.Room
 import com.yyz.match.R
 import com.yyz.match.base.BaseActivity
-import com.yyz.match.database.MatchDatabase
 import com.yyz.match.entity.PersonBean
 import com.yyz.match.entity.TableBean
 
@@ -45,22 +43,23 @@ class AddActivity : BaseActivity() {
             val s = input.text.toString()
             val tableName = table.text.toString()
             if (s.isBlank() || tableName.isBlank()) {
-                Toast.makeText(this, "error", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "请输入完整的参数", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             val list = processList(s, tableName)
-//            insertList(list)
             db.getPersonDao().insertPersonList(list)
-            db.getTableDao().insert(TableBean(tableName))
-            Toast.makeText(this, "success", Toast.LENGTH_SHORT).show()
+            if (tableName !in getTableNameList()) {
+                db.getTableDao().insert(TableBean(tableName))
+            }
+            Toast.makeText(this, "名单创建完成", Toast.LENGTH_SHORT).show()
             finish()
         }
     }
 
     private fun processList(s: String, table: String): MutableList<PersonBean> {
         val list = mutableListOf<PersonBean>()
-        for (p in s.split(Regex("\n"))) {
-            if (p.isNotEmpty()) {
+        for (p in s.split(Regex("\n")).distinct()) {
+            if (p.isNotEmpty() && p !in getPersonList(table)) {
                 val personBean = PersonBean(p, table)
                 list.add(personBean)
             }
@@ -68,51 +67,11 @@ class AddActivity : BaseActivity() {
         return list
     }
 
-//    private fun insertList(list: MutableList<PersonBean>) {
-//        val table = Constants.table
-//        val sql = "INSERT INTO $table(parameter) values(?)"
-//        val helper1 = MyDbHelper(this, table, 1)
-//        val db1 = helper1.writableDatabase
-//        val stat = db1.compileStatement(sql)
-//        for (l in list) {
-//            stat.bindString(1, l.parameter)
-//            stat.executeInsert()
-//        }
-////        db1.setTransactionSuccessful()
-////        db1.endTransaction()
-//        db1.close()
-//    }
-//
-//    private fun insertList(table: String, list: MutableList<PersonBean>) {
-//        val sql = "INSERT INTO $table(parameter) values(?)"
-//        val helper1 = MyDbHelper(this, table, 1)
-//        val db1 = helper1.writableDatabase
-//        val stat = db1.compileStatement(sql)
-//        for (l in list) {
-//            stat.bindString(1, l.parameter)
-//            stat.executeInsert()
-//        }
-////        db1.setTransactionSuccessful()
-////        db1.endTransaction()
-//        db1.close()
-//    }
-//
-//    private fun getTableList(): MutableList<TableBean> {
-//        val table = Constants.tableList
-//        val list = mutableListOf<TableBean>()
-//        val helper1 = MyDbHelper(this, table, Constants.version)
-//        val db1 = helper1.readableDatabase
-//        val cursor = db1.query(table, null, null, null, null, null, null)
-//        if (cursor.moveToNext()) {
-//            do {
-//                val id = cursor.getInt(cursor.getColumnIndex("id"))
-//                val name = cursor.getString(cursor.getColumnIndex("name"))
-//                val chinese = cursor.getString(cursor.getColumnIndex("chinese"))
-//                list.add(TableBean(id, name, chinese))
-//            } while (cursor.moveToNext())
-//        }
-//        cursor.close()
-//        Constants.version = list.size
-//        return list
-//    }
+    private fun getTableNameList(): MutableList<String> {
+        return db.getTableDao().getAllTable().map { it.chinese }.sorted().toMutableList()
+    }
+
+    private fun getPersonList(table: String): MutableList<String> {
+        return db.getPersonDao().getPersonByTable(table).map { it.parameter }.sorted().toMutableList()
+    }
 }
