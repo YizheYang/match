@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">match</string>
+    <string name="app_name">名单匹配</string>
 
     <string name="addListHint">xxx\nxxx\n或者\n1.xxx\n2.xxx\n(重点是名字中间不要有空格，一个名字一行)</string>
 </resources>

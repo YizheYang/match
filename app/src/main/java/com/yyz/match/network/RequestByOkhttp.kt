@@ -59,9 +59,9 @@ class RequestByOkhttp {
         }
 
         override fun onFailure(call: Call, e: IOException) {
-            context?.let {
-                handler.sendEmptyMessage(2)
-            }
+//            context?.let {
+//                handler.sendEmptyMessage(2)
+//            }
         }
 
         override fun onResponse(call: Call, response: Response) {

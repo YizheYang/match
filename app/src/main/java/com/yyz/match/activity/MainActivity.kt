@@ -6,7 +6,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Button
 import com.google.gson.Gson
-import com.yyz.match.BuildConfig
 import com.yyz.match.Constants
 import com.yyz.match.R
 import com.yyz.match.base.BaseActivity
@@ -14,6 +13,7 @@ import com.yyz.match.entity.UpdateInfoBean
 import com.yyz.match.network.RequestByOkhttp
 import okhttp3.Call
 import okhttp3.Response
+import org.angmarch.views.BuildConfig
 import kotlin.concurrent.thread
 
 class MainActivity : BaseActivity() {
